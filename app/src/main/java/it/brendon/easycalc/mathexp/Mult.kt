@@ -8,6 +8,10 @@ class Mult(
     override val needsBraces: Boolean = false
 
     override fun eval(): Expr {
+        // Evaluate expressions before operating
+        val e1 = e1.eval()
+        val e2 = e2.eval()
+
         return if (e1 is Const && e2 is Const) {
             when {
                 e1.number == 0.0 -> Const(0.0)
@@ -23,7 +27,7 @@ class Mult(
                     1.0 -> e2
                     else -> e2.scalar?.let {
                         Mult(Const(e1.number * it.first.number), it.second)
-                    } ?: this
+                    } ?: Mult(e1, e2)
                 }
             } else if (e2 is Const) {
                 when (e2.number) {
@@ -31,10 +35,10 @@ class Mult(
                     1.0 -> e1
                     else -> e1.scalar?.let {
                         Mult(Const(it.first.number * e2.number), it.second)
-                    } ?: this
+                    } ?: Mult(e1, e2)
                 }
             } else {
-                this
+                Mult(e1, e2)
             }
         }
     }

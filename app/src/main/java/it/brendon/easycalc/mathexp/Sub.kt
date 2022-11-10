@@ -10,17 +10,27 @@ class Sub(
     override val scalar: Pair<Const, Expr>? = null
 
     override fun eval(): Expr {
+        // Eval expressions before operating
+        val e1 = e1.eval()
+        val e2 = e2.eval()
+
         return if (e1 is Const && e2 is Const) {
             when {
                 e1.number == 0.0 -> Const(e2.number)
                 e2.number == 0.0 -> Const(e2.number)
-                else -> Const(e1.number + e2.number)
+                else -> Const(e1.number - e2.number)
             }
         } else {
-            when (e2) {
-                is Const -> Sub(e2, e1)
-                else -> this
-            }
+            Sub(e1, e2)
+        }
+    }
+
+    override fun equals(other: Any?): Boolean {
+        other ?: return false
+
+        return when (other) {
+            is Sub -> (e1 == other.e1 && e2 == other.e2)
+            else -> false
         }
     }
 
